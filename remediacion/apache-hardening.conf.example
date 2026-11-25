@@ -1,0 +1,18 @@
+# Ejemplo de hardening para Apache httpd (VirtualHost *:443). Requiere mod_ssl y mod_headers.
+
+# VULN-01 · Solo TLS 1.2+
+SSLProtocol             -all +TLSv1.2 +TLSv1.3
+SSLHonorCipherOrder     on
+SSLCipherSuite          ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384
+
+# VULN-05 · HSTS
+Header always set Strict-Transport-Security "max-age=31536000"
+
+# VULN-06 · nosniff
+Header always set X-Content-Type-Options "nosniff"
+
+# VULN-07 · CSP restrictiva (ajustar a los recursos reales del sitio)
+Header always set Content-Security-Policy "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+
+# VULN-02/03/04 · Reforzar los atributos de las cookies emitidas por la aplicación
+Header always edit Set-Cookie ^(.*)$ "$1; HttpOnly; Secure; SameSite=Lax"
